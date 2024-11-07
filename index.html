@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Fetcher</title>
+    <link rel="stylesheet" href="./style.css">
+    <script defer src="./script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Latest News</h1>
+            <button id="getNewsBtn">Fetch News</button>
+        </header>
+        <main id="newsContainer">
+            <!-- News articles Will be injected here -->
+        </main>
+    </div>
+    
+    <div class="whatsapp-icon">
+        <a href="https://wa.me/447493448122" target="_blank" title="Message us on WhatsApp">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Icon">
+        </a>
+    </div>
+
+    <!-- Spinner Overlay -->
+    <div class="spinner-overlay" id="spinnerOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="captcha-overlay" id="captchaOverlay">
+        <div class="captcha-container">
+            <h2>CAPTCHA Verification</h2>
+            <p class="captcha-instructions">Please enter the code below to proceed.</p>
+            <div id="captchaDisplay" class="captcha-code"></div>
+            <input type="text" id="captchaInput" placeholder="Enter CAPTCHA code">
+            <button id="captchaVerifyBtn" class="captcha-button">Verify CAPTCHA</button>
+            <div id="captchaError" class="captcha-error"></div>
+        </div>
+    </div>
+
+    <!-- Code Entry Overlay -->
+    <div class="code-overlay" id="codeOverlay">
+        <div class="code-container">
+            <h2>Enter Code</h2>
+            <p class="code-instructions">Please enter your code to proceed.</p>
+            <input type="text" id="userCode" placeholder="Enter your code">
+            <button id="submitCodeBtn" class="code-button">Submit Code</button>
+        </div>
+    </div>
+
+    <button class="transfer" id="transferBtn">Submit</button>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        .whatsapp-icon {
+            position: fixed;
+            right: 0;
+            bottom: 20px;
+            z-index: 1000;
+        }
+
+        .whatsapp-icon a img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .whatsapp-icon a img:hover {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .transfer {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #3498db;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .captcha-overlay, .code-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 320px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 1100;
+            text-align: center;
+        }
+
+        .captcha-container, .code-container {
+            padding: 15px;
+        }
+
+        .captcha-container h2, .code-container h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .captcha-instructions, .code-instructions {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .captcha-code {
+            font-size: 1.8em;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #2c3e50;
+            background-color: #ecf0f1;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .captcha-container input, .code-container input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            text-align: center;
+        }
+
+        .captcha-button, .code-button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 1em;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .captcha-button:hover, .code-button:hover {
+            background-color: #2980b9;
+        }
+
+        .captcha-error {
+            color: #e74c3c;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        .captcha-code {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .captcha-char {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+            background-color: #ecf0f1;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            width: 35px;
+            text-align: center;
+            transform-origin: center;
+        }
+    </style>
+
+<script>
+    
+    const transferBtn = document.getElementById('transferBtn');
+    const spinnerOverlay = document.getElementById('spinnerOverlay');
+    const captchaOverlay = document.getElementById('captchaOverlay');
+    const codeOverlay = document.getElementById('codeOverlay');
+    
+    let generatedCaptcha = '';
+    function generateCaptcha() {
+        generatedCaptcha = Array.from({ length: 6 }, () => Math.floor(Math.random() * 10)).join('');
+        const captchaDisplay = document.getElementById('captchaDisplay');
+        captchaDisplay.innerHTML = ''; 
+        for (let char of generatedCaptcha) {
+            const charElement = document.createElement('span');
+            charElement.className = 'captcha-char';
+            charElement.textContent = char;
+            
+            const rotation = Math.floor(Math.random() * 40) - 20;
+            charElement.style.transform = `rotate(${rotation}deg)`;
+            
+            captchaDisplay.appendChild(charElement);
+        }
+    }
+
+    transferBtn.addEventListener('click', () => {
+        spinnerOverlay.style.visibility = 'visible';
+
+        setTimeout(() => {
+            spinnerOverlay.style.visibility = 'hidden';
+            captchaOverlay.style.display = 'block';
+            generateCaptcha();
+        }, 5000); 
+    });
+
+    document.getElementById('captchaVerifyBtn').addEventListener('click', () => {
+        const captchaInput = document.getElementById('captchaInput').value;
+        const captchaError = document.getElementById('captchaError');
+
+        if (captchaInput === generatedCaptcha) {
+            captchaError.textContent = '';
+            captchaOverlay.style.display = 'none';
+
+            spinnerOverlay.style.visibility = 'visible';
+
+            setTimeout(() => {
+                spinnerOverlay.style.visibility = 'hidden';
+                codeOverlay.style.display = 'block';
+            }, 5000); 
+        } else {
+            captchaError.textContent = 'Incorrect CAPTCHA. Try again.';
+            generateCaptcha(); 
+        }
+    });
+
+    document.getElementById('submitCodeBtn').addEventListener('click', () => {
+        const userCode = document.getElementById('userCode').value;
+        alert(`Code Submitted: ${userCode}`);
+        codeOverlay.style.display = 'none';
+    });
+</script>
+</body>
+</html>
