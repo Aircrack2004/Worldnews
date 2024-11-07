@@ -8,28 +8,36 @@ document.addEventListener("DOMContentLoaded", function(){
         
         fetch(url)
         .then(response => {
-            console.log("Response received, converting to JSON...");
+            // Check if the response is okay before converting it to JSON
+            if (!response.ok) {
+                throw new Error("Failed to fetch news");
+            }
             return response.json();
         })
         .then(data => {
             console.log("Data received", data);
-            const articles = data.articles;
-
-            newsContainer.innerHTML = ''; 
-
-            articles.forEach(article => {
-                const articleElement = document.createElement("div");
-                articleElement.innerHTML = `
-                    <h2>${article.title}</h2> 
-                    <p>${article.description}</p>
-                    <a href="${article.url}" target="_blank">Read more</a>
-                `;
-                newsContainer.appendChild(articleElement);
-            });
+            
+            // Check if 'articles' is an array before using .forEach
+            if (Array.isArray(data.articles)) {
+                const articles = data.articles;
+                newsContainer.innerHTML = ''; // Clear previous news
+                
+                articles.forEach(article => {
+                    const articleElement = document.createElement("div");
+                    articleElement.innerHTML = `
+                        <h2>${article.title}</h2> 
+                        <p>${article.description}</p>
+                        <a href="${article.url}" target="_blank">Read more</a>
+                    `;
+                    newsContainer.appendChild(articleElement);
+                });
+            } else {
+                newsContainer.innerHTML = "No news articles found.";
+            }
         })
         .catch(error => {
             console.log("Error fetching news", error);
-            newsContainer.innerHTML = `Error fetching news: ${error}`;
+            newsContainer.innerHTML = `Error fetching news: ${error.message}`;
         });
     });
 });
